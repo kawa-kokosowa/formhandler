@@ -39,12 +39,13 @@ def reflect(upload_file, save_directory=None):
 All we have to to is:
 
 ```python
+# overrides default input types; a list is <select>
 types = {'upload_file': 'file', 'save_directory': ['uploads', 'resources'],}
 print 'Content-Type: text/html\n'
 print form_handler(make_uppercase, reflect, reflect=types)
 ```
 
-... this will both provide us a form like this:
+... which will process form input (and output the HTML-friendly evaluation of both make_uppercase and reflect), plus provide us a form like this:
 
 ```html
 <form enctype="multipart/form-data" method="post">
