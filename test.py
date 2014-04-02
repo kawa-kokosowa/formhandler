@@ -21,7 +21,6 @@ def make_uppercase(s):
     return s.upper()
 
 
-# Test!
 def reflect(upload_file, save_directory=None):
     """Simply display an image from path.
 
