@@ -44,3 +44,49 @@ print 'Content-Type: text/html\n'
 print form_handler(make_uppercase, reflect, reflect=types)
 ```
 
+... this will both provide us a form like this:
+
+```html
+<form enctype="multipart/form-data" method="post">
+<fieldset>
+<legend>Make Uppercase</legend>
+<input type="hidden" name="make_uppercase" id="make_uppercase" value="true"><section class="form-help">
+<pre>
+Test function for converting a string to uppercase.
+
+Here is another test paragraph.
+
+Args:
+  s (str): string to make uppercase.</pre>
+</section>
+<label for="s">S:</label>
+<input type="text" name="s" id="s"><br>
+<input type="submit" value="Process: Make Uppercase">
+</fieldset>
+</form>
+
+<form enctype="multipart/form-data" method="post">
+<fieldset>
+<legend>Reflect</legend>
+<input type="hidden" name="reflect" id="reflect" value="true"><section class="form-help">
+<pre>
+Simply display an image from path.
+
+Lets formhandler do the image saving part.
+
+upload_file (cgi.file_item?)
+save_directory (str): the directory in which the file goes.</pre>
+</section>
+<label for="upload_file">Upload File:</label>
+<input type="file" name="upload_file" id="upload_file"><br>
+
+<label for="save_directory">Save Directory</label>
+<select name="save_directory" id="save_directory">
+<option value="uploads">Uploads</option>
+<option value="resources">Resources</option>
+</select><input type="submit" value="Process: Reflect">
+</fieldset>
+</form>
+```
+
+There is currently no real thought put into templating.

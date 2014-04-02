@@ -35,7 +35,7 @@ def httpd():
 
     handler = CGIHTTPServer.CGIHTTPRequestHandler
     handler.cgi_directories = ['/', 'resources']
-    cgi_server = ThreadingCGIServer((LISTEN_ADDRESS, LISTEN_PORT), handler)
+    server = ThreadingCGIServer((LISTEN_ADDRESS, LISTEN_PORT), handler)
 
     try:
 

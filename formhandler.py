@@ -54,11 +54,11 @@ def docstring_html(function):
     """
 
     html = StringIO()
-    html.write('<section class="form-help">')
-    html.write('<pre>')
+    html.write('<section class="form-help">\n')
+    html.write('<pre>\n')
     html.write(inspect.getdoc(function))
-    html.write('</pre>')
-    html.write('</section>')
+    html.write('</pre>\n')
+    html.write('</section>\n')
 
     return html.getvalue()
 
@@ -169,9 +169,9 @@ class FormHandler(object):
 
         # Put all the pieces together...
         form = StringIO()
-        form.write('<form enctype="multipart/form-data" method="post">')
-        form.write('<fieldset>')
-        form.write('<legend>' + title + '</legend>')
+        form.write('<form enctype="multipart/form-data" method="post">\n')
+        form.write('<fieldset>\n')
+        form.write('<legend>' + title + '</legend>\n')
         form.write(hidden_trigger_field)
 
         if about:
@@ -180,9 +180,9 @@ class FormHandler(object):
         if fields:
             form.write(fields)
 
-        form.write('<input type="submit" value="Process: %s">' % title)
-        form.write('</fieldset>')
-        form.write('</form>')
+        form.write('<input type="submit" value="Process: %s">\n' % title)
+        form.write('</fieldset>\n')
+        form.write('</form>\n\n')
 
         return form.getvalue()
 
