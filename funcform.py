@@ -16,6 +16,7 @@ RECOMMENDATIONS:
 
 DEVELOPER NOTES:
   - Makes heavy usage of the "cgi" module.
+  - Needs some prettification; will probably use BeautifulSoup...
 
 USAGE/EXAPMLES:
   >>>
@@ -31,7 +32,6 @@ import cgi
 import cgitb; cgitb.enable()
 import inspect
 from cStringIO import StringIO
-import textwrap
 
 
 # CONFIG/CONSTANTS ############################################################
@@ -68,9 +68,6 @@ HTML_INPUT_FIELD = '''
 # GENERIC PYTHON DATA > HTML ##################################################
 
 
-# a common way I build HTML
-template = lambda s, d: textwrap.dedent(s.format(**d))
-
 # Python variable name to user-friendly name.
 var_title = lambda s: s.replace('_', ' ').title()
 
@@ -88,8 +85,6 @@ def docstring_html(function):
 
     """
 
-    # this should use template()
-        # this should use template()
     html = StringIO()
     html.write('<section class="form-help">\n')
     html.write('<pre>\n')
@@ -194,7 +189,7 @@ class FuncForm(object):
 
                 raise Exception('invalid argument type')
 
-            fields.append(template(new_field, parts))
+            fields.append(new_field.format(**parts))
 
         # build form_parts...
         form_parts = {
@@ -211,7 +206,7 @@ class FuncForm(object):
                                                .format(self.name)),
                      }
 
-        return template(FORM, form_parts)
+        return FORM.format(**form_parts)
 
     def evaluate(self, form):
 
