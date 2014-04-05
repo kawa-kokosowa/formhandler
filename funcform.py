@@ -1,5 +1,5 @@
 #!/usr/local/bin/python
-"""Form handler: sometimes the web interface is an afterthought.
+"""funcform: sometimes the web interface is an afterthought.
 Lillian Lynn Mahoney
 
 PURPOSE:
@@ -88,6 +88,8 @@ def docstring_html(function):
 
     """
 
+    # this should use template()
+        # this should use template()
     html = StringIO()
     html.write('<section class="form-help">\n')
     html.write('<pre>\n')
@@ -138,7 +140,7 @@ def iter_dicts_table(iter_dicts):
 # The juice ###################################################################
 
 
-class FormHandler(object):
+class FuncForm(object):
 
     def __init__(self, function, argument_types=None):
         self.function = function
@@ -167,15 +169,17 @@ class FormHandler(object):
         fields = []
 
         for argument in self.args + self.kwargs.keys():
-            # text input is the default kind of argument
+            # argument_type may be 'text', 'file', or a Python list,
+            # representing options in a select field.
             argument_type = self.argument_types.get(argument, 'text')
             parts = {
                      'argument name': argument,
                      'argument title': var_title(argument),
                     }
 
-            # <select>?
-            if type(argument_type) is type(list()):
+            if isinstance(argument_type, list):
+                # build <select> <options> from the list
+                # denoted as the argument type
                 options = argument_type
                 option = '<option value="%s">%s</option>'
                 options = [option % (o, var_title(o)) for o in options]
@@ -213,7 +217,7 @@ class FormHandler(object):
 
         # If the function name is not in POST/GET, we're providing
         # the HTML input form.
-        if not form.getvalue(self.name):
+        if form.getvalue(self.name) is None:
 
             return self.to_form(), None
 
@@ -270,7 +274,7 @@ class FormHandler(object):
             pass
 
         # This SHOULDN'T be possible.
-        raise Exception('IDK how this is possible!')
+        raise Exception('Unhandled evaluation type!')
 
 
 def file_or_text(form, form_field):
@@ -288,20 +292,26 @@ def file_or_text(form, form_field):
 
     """
 
-    if not form.getvalue(form_field):
+    item = form.getvalue(form_field)
+
+    if item is None:
 
         return None
 
-    fileitem = form[form_field]
+    elif item.filename:
 
-    if fileitem.filename:
+        return item
 
-        return fileitem
+    elif isinstance(item, str):
 
-    return form.getvalue(form_field)
+        return form.getvalue(form_field)
+
+    elif isinstance(item, list):
+
+        raise Exception('Lists Not implemented ;_;')
 
 
-def form_handler(*functions, **kwargs):
+def funcform(*functions, **kwargs):
     """Just form_handler for multiple functions, while returning
     ONLY the function evaluation on POST/GET.
 
@@ -315,7 +325,7 @@ def form_handler(*functions, **kwargs):
     output = ''
 
     for function in functions:
-        handler = FormHandler(function)
+        handler = FuncForm(function)
         handler.argument_types = kwargs.get(handler.name, {})
         evaluation, post_get = handler.evaluate(form)
 

@@ -1,9 +1,9 @@
-formhandler
+funcform
 ===========
 
 Sometimes the web interface is an afterthought.
 
-I've learned what I /really/ want from a web framework: as little work or involvement on my part as possible. So that's what formhandler does.
+I've learned what I /really/ want from a web framework: as little work or involvement on my part as possible. So that's what funcform does.
 
 This builds input forms from a function and then handles the POST/GET data, rendering the evaluation as HTML.
 
@@ -44,7 +44,7 @@ All we have to to is:
 # overrides default input types; a list is <select>
 types = {'upload_file': 'file', 'save_directory': ['uploads', 'resources'],}
 print 'Content-Type: text/html\n'
-print form_handler(make_uppercase, reflect, reflect=types)
+print funcform(make_uppercase, reflect, reflect=types)
 ```
 
 ... which will process form input (and output the HTML-friendly evaluation of both make_uppercase and reflect), plus provide us a form like this:
