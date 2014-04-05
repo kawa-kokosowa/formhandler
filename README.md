@@ -13,6 +13,8 @@ This builds input forms from a function and then handles the POST/GET data, rend
 2. Open http://127.0.0.1:8080/test.py in a web browser.
 3. Open test.py in a file editor to see what's going on!
 
+Note: you may need to chmod +X the proper cgi scripts. I also may need to change file headers to #!/usr/bin/python. You need to create the uploads and resources directory for the demo. Just make demo directory.
+
 # Example Usage
 
 Say we want a web interace for these functions (see: test.py):

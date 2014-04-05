@@ -31,10 +31,45 @@ import cgi
 import cgitb; cgitb.enable()
 import inspect
 from cStringIO import StringIO
+import textwrap
+
+
+# CONFIG/CONSTANTS ############################################################
+
+
+FORM = '''
+       <form enctype="multipart/form-data" method="post">
+         <fieldset>
+           <legend>{title}</legend>
+           {about}
+           {hidden trigger field}
+           {fields}
+           <input type="submit" value="Process: {title}">
+         </fieldset>
+       </form>
+       '''
+SELECT = '''
+         <label for="{argument name}">{argument title}</label>
+         <select name="{argument name}" id="{argument name}">
+           {options}
+         </select>
+         '''
+HTML_INPUT_FIELD = '''
+                   <label for="{argument name}">
+                     {argument title}
+                   </label>
+                   <input type="{input type}" 
+                          name="{argument name}"
+                          id="{argument name}">
+                   <br>
+                   '''
 
 
 # GENERIC PYTHON DATA > HTML ##################################################
 
+
+# a common way I build HTML
+template = lambda s, d: textwrap.dedent(s.format(**d))
 
 # Python variable name to user-friendly name.
 var_title = lambda s: s.replace('_', ' ').title()
@@ -116,7 +151,7 @@ class FormHandler(object):
 
     def to_form(self):
         """Returns the HTML input form for a function.
-        
+
         Returns:
           str: HTML input form, for submitting arguments to a python
             function, via POST/GET.
@@ -134,57 +169,45 @@ class FormHandler(object):
         for argument in self.args + self.kwargs.keys():
             # text input is the default kind of argument
             argument_type = self.argument_types.get(argument, 'text')
+            parts = {
+                     'argument name': argument,
+                     'argument title': var_title(argument),
+                    }
 
             # <select>?
             if type(argument_type) is type(list()):
+                options = argument_type
                 option = '<option value="%s">%s</option>'
-                options = [option % (o, o.title()) for o in argument_type]
-                options = '\n'.join(options)
-                select = '<select name="{0}" id="{0}">\n{1}\n</select>'
-                label = '<label for="{0}">' + var_title(argument) + '</label>'
-                new_field = (label + '\n' + select).format(argument, options)
+                options = [option % (o, var_title(o)) for o in options]
+                parts['options'] = '\n'.join(options)
+                new_field = SELECT
 
             elif argument_type in ('text', 'file'):
-                html_input_field = ('<label for="{0}">{1}:</label>\n'
-                                    '<input type="{2}" name="{0}" id="{0}">'
-                                    '<br>\n')
-                new_field = html_input_field.format(argument,
-                                                    var_title(argument),
-                                                    argument_type)
+                parts['input type'] = argument_type
+                new_field = HTML_INPUT_FIELD
 
             else:
+
                 raise Exception('invalid argument type')
 
-            fields.append(new_field)
+            fields.append(template(new_field, parts))
 
-        fields = '\n'.join(fields)
+        # build form_parts...
+        form_parts = {
+                      'title': title or '',
+                      'fields': '\n'.join(fields),
 
-        # The about section describing this form, based on docstring.
-        about = docstring_html(self.function)
+                      # Section describing this form, based on docstring.
+                      'about': docstring_html(self.function) or '',
 
-        # Function name as a hidden field so that it may trigger the
-        # evaluation of the function upon form submission!
-        hidden_trigger_field = ('<input type="hidden" name="{0}" id="{0}" '
-                                'value="true">').format(self.name)
+                      # Function name as hidden field so it may trigger the
+                      # evaluation of the function upon form submission!
+                      'hidden trigger field': ('<input type="hidden" id="{0}"'
+                                               'name="{0}" value="true">'
+                                               .format(self.name)),
+                     }
 
-        # Put all the pieces together...
-        form = StringIO()
-        form.write('<form enctype="multipart/form-data" method="post">\n')
-        form.write('<fieldset>\n')
-        form.write('<legend>' + title + '</legend>\n')
-        form.write(hidden_trigger_field)
-
-        if about:
-            form.write(about)
-
-        if fields:
-            form.write(fields)
-
-        form.write('<input type="submit" value="Process: %s">\n' % title)
-        form.write('</fieldset>\n')
-        form.write('</form>\n\n')
-
-        return form.getvalue()
+        return template(FORM, form_parts)
 
     def evaluate(self, form):
 
