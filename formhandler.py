@@ -247,19 +247,18 @@ class FormHandler(object):
 
         # Now we must analyze the evaluation of the function, in order
         # to properly format the results to HTML.
-        evaluation_type = type(evaluation)
-        eval_is = lambda x: evaluation_type is type(x())
 
         # ... Evaluation is a string; just use paragraph formatting.
-        if eval_is(str):
+        if isinstance(evaluation, str):
 
             return paragraphs(evaluation), form
 
         # ... Evaluation is iterable sequence; further options below...
-        elif eval_is(list) or eval_type(tuple):
+        elif (isinstance(evaluation, list)
+              or isinstance(evaluation, tuple)):
 
             # Evaluation is an iterable sequence of dictionaries?
-            if type(evaluation[0]) is type(dict()):
+            if isinstance(evaluation[0], dict):
                 possible_table = iter_dicts_table(evaluation)
 
                 if possible_table:
@@ -267,7 +266,7 @@ class FormHandler(object):
                     return possible_table, form
 
         # Evaluation is simply a dictionary! Create a definition list.
-        elif eval_is(dict):
+        elif isinstance(evaluation, dict):
             pass
 
         # This SHOULDN'T be possible.
@@ -295,11 +294,11 @@ def file_or_text(form, form_field):
 
     fileitem = form[form_field]
 
-    if not fileitem.filename:
+    if fileitem.filename:
 
-        return form.getvalue(form_field)
+        return fileitem
 
-    return fileitem
+    return form.getvalue(form_field)
 
 
 def form_handler(*functions, **kwargs):
