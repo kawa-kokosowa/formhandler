@@ -26,13 +26,21 @@ def reflect(upload_file, save_directory=None):
 
     Lets funcform do the image saving part.
 
-    upload_file (cgi.file_item?)
-    save_directory (str): the directory in which the file goes.
+    Will create directories if not exist...
+
+    Args:
+      upload_file (cgi.file_item?)
+      save_directory (str): the directory in which the file goes.
 
     """
 
     if save_directory and save_directory in ('resources', 'uploads'):
+
+        if not os.path.exists(save_directory):
+            os.makedirs(save_directory)
+
         path = os.path.join(save_directory, upload_file.filename)
+
     else:
         path = upload_file.filename
 

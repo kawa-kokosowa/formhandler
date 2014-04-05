@@ -298,17 +298,16 @@ def file_or_text(form, form_field):
 
         return None
 
-    elif item.filename:
+    # item is a file
+    elif form[form_field].filename:
+
+        # this returns the fileitem
+        return form[form_field]
+
+    # item is string or list
+    else:
 
         return item
-
-    elif isinstance(item, str):
-
-        return form.getvalue(form_field)
-
-    elif isinstance(item, list):
-
-        raise Exception('Lists Not implemented ;_;')
 
 
 def funcform(*functions, **kwargs):
