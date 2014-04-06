@@ -135,7 +135,7 @@ def iter_dicts_table(iter_dicts):
 # The juice ###################################################################
 
 
-class FuncForm(object):
+class FormHandler(object):
 
     def __init__(self, function, argument_types=None):
         self.function = function
@@ -305,7 +305,7 @@ def file_or_text(form, form_field):
         return item
 
 
-def funcform(*functions, **kwargs):
+def form_handler(*functions, **kwargs):
     """Just form_handler for multiple functions, while returning
     ONLY the function evaluation on POST/GET.
 
@@ -333,5 +333,4 @@ def funcform(*functions, **kwargs):
             output += evaluation
 
     return output
-
 
