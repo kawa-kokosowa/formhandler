@@ -1,9 +1,9 @@
 #!/usr/local/bin/python
-"""An example of funcform's capabilities.
+"""An example of formhandler's capabilities.
 
 """
 
-from funcform import funcform
+from formhandler import form_handler
 import os
 
 
@@ -24,7 +24,7 @@ def make_uppercase(s):
 def reflect(upload_file, save_directory=None):
     """Simply display an image from path.
 
-    Lets funcform do the image saving part.
+    Lets formhandler do the image saving part.
 
     Will create directories if not exist...
 
@@ -53,5 +53,5 @@ def reflect(upload_file, save_directory=None):
 # Test!
 types = {'upload_file': 'file', 'save_directory': ['uploads', 'resources'],}
 print 'Content-Type: text/html\n'
-print funcform(make_uppercase, reflect, reflect=types)
+print form_handler(make_uppercase, reflect, reflect=types)
 

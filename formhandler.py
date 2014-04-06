@@ -319,7 +319,7 @@ def form_handler(*functions, **kwargs):
     output = ''
 
     for function in functions:
-        handler = FuncForm(function)
+        handler = FormHandler(function)
         handler.argument_types = kwargs.get(handler.name, {})
         evaluation, post_get = handler.evaluate(form)
 
