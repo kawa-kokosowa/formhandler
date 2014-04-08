@@ -11,6 +11,7 @@ I mean, I'm pretty sure you can make the server execute itself, y'know?
 
 import os
 import sys
+import webbrowser
 import SocketServer
 import BaseHTTPServer
 import CGIHTTPServer
@@ -35,7 +36,13 @@ def httpd():
 
     handler = CGIHTTPServer.CGIHTTPRequestHandler
     handler.cgi_directories = ['/', 'resources']
-    server = ThreadingCGIServer((LISTEN_ADDRESS, LISTEN_PORT), handler)
+    listen_info = (LISTEN_ADDRESS, LISTEN_PORT)
+    server = ThreadingCGIServer(listen_info, handler)
+
+    if not LISTEN_ADDRESS:
+        listen_info = ('localhost', LISTEN_PORT)
+
+    webbrowser.open('http://%s:%s/test.py' % listen_info)
 
     try:
 
