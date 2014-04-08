@@ -1,29 +1,29 @@
 #!/usr/local/bin/python
-"""funcform: sometimes the web interface is an afterthought.
+"""formhandler: sometimes the web interface is an afterthought.
 Lillian Lynn Mahoney
 
-PURPOSE:
+Automate the development of a web/CGI script interface to a
+function.
+
+  1. Generates HTML forms: the HTML form(s) the CGI script provides
+     utilizes data about the functions (introspection) to create
+     the HTML form(s) (input interface to functions).
+  2. Handles form(s) data: Each POST/GET field from the aforementioned
+     form(s) is sent to its respective function and argument.
+  3. Presents evaluations: the evaluation(s) of step #2 is then
+     HTML-ified, and returned (output interface).
+
+SUMMARY:
   Pipe input from web form to a Python function, pipe output back to a
   web page. Make this process require as little code as possible.
 
   Includes tools for automatically converting data returned from a
   function, to HTML, e.g., dict > html, list > html, etc.
 
-RECOMMENDATIONS:
-  Do not even consider formhandler in your development process. Then,
-  make a single function which acts as the interface/form handler, to
-  be utilized with formhandler.
-
 DEVELOPER NOTES:
   - Makes heavy usage of the "cgi" module.
   - Needs some prettification; will probably use BeautifulSoup...
-
-USAGE/EXAPMLES:
-  >>>
-
-BONUS:
-  Includes tool for editing parts of the template, an example
-  tool which edits an SQLITE database/table.
+  - Soon I'll include an example which is a SQLITE3 table editor.
 
 """
 
@@ -95,13 +95,15 @@ def docstring_html(function):
     return html.getvalue()
 
 
-def iter_dicts_table(iter_dicts):
+def iter_dicts_table(iter_dicts, classes=None, check=False):
     """Convert an iterable sequence of dictionaries (all of which with
     identical keys) to an HTML table.
 
     Args:
-      iter_dicts: an iterable sequence (list, tuple) of dictionaries,
-        dictionaries having identical keys.
+      iter_dicts (iter): an iterable sequence (list, tuple) of
+        dictionaries, dictionaries having identical keys.
+      classes (str): Is the substitute for <table class="%s">.
+      check (bool): check for key consistency!
 
     Returns:
       str|None: HTML tabular representation of a Python iterable sequence of
@@ -110,23 +112,38 @@ def iter_dicts_table(iter_dicts):
 
     """
 
-    # first check key consistency
-    first_keys = iter_dicts[0].keys()
+    # check key consistency
+    if check:
+        first_keys = iter_dicts[0].keys()
 
-    for d in evaluation:
+        for d in iter_dicts:
 
-        if d.keys() != first_keys:
+            if d.keys() != first_keys:
 
-            return None
+                return None
 
     html = StringIO()
     keys = ['<td>%(' + key + ')s</td>' for key in iter_dicts[0]]
     row = '<tr>' + ''.join(keys) + '</tr>'
-    html.write('<table>')
+
+    if classes:
+        html.write('<table class="%s">' % classes)
+    else:
+        html.write('<table>')
+
+    # write the table head...
+    html.write('<thead><tr>')
+    column_headers = ''.join(['<th>%s</th>' % k for k in iter_dicts[0]])
+    html.write(column_headers)
+    html.write('</tr></thead>')
+
+    # write the table body...
+    html.write('<tbody>')
 
     for d in iter_dicts:
         html.write(row % d)
 
+    html.write('</tbody>')
     html.write('</table>')
 
     return html.getvalue()
