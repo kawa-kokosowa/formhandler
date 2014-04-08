@@ -24,6 +24,7 @@ DEVELOPER NOTES:
   - Makes heavy usage of the "cgi" module.
   - Needs some prettification; will probably use BeautifulSoup...
   - Soon I'll include an example which is a SQLITE3 table editor.
+  - I always try to do templating LAST (the .format() part).
 
 """
 
@@ -63,6 +64,12 @@ HTML_INPUT_FIELD = '''
                           id="{argument name}">
                    <br>
                    '''
+FORM_DESCRIPTION = '''
+                   <section class="form-help">
+                     <pre>{0}</pre>
+                   </section>
+                   '''
+BACK_TO_INPUT = '<form><input type="submit" value="Back to Form"></form>'
 
 
 # GENERIC PYTHON DATA > HTML ##################################################
@@ -83,16 +90,11 @@ def docstring_html(function):
     A work in progress. I will try to use someone else's library
     for this!
 
+    Boilerplate--AT THE MOMENT! Will be an actual parser in the future.
+
     """
 
-    html = StringIO()
-    html.write('<section class="form-help">\n')
-    html.write('<pre>\n')
-    html.write(inspect.getdoc(function))
-    html.write('</pre>\n')
-    html.write('</section>\n')
-
-    return html.getvalue()
+    return FORM_DESCRIPTION.format(inspect.getdoc(function))
 
 
 def iter_dicts_table(iter_dicts, classes=None, check=False):
@@ -122,31 +124,25 @@ def iter_dicts_table(iter_dicts, classes=None, check=False):
 
                 return None
 
-    html = StringIO()
+    table_parts = {}
+    table_parts['classes'] = ' class="%s"' % classes if classes else ''
+    table_parts['thead'] = ''.join(['<th>%s</th>' % k for k in iter_dicts[0]])
+
+    # tbody
     keys = ['<td>%(' + key + ')s</td>' for key in iter_dicts[0]]
     row = '<tr>' + ''.join(keys) + '</tr>'
+    table_parts['tbody'] = '\n'.join([row % d for d in iter_dicts])
 
-    if classes:
-        html.write('<table class="%s">' % classes)
-    else:
-        html.write('<table>')
-
-    # write the table head...
-    html.write('<thead><tr>')
-    column_headers = ''.join(['<th>%s</th>' % k for k in iter_dicts[0]])
-    html.write(column_headers)
-    html.write('</tr></thead>')
-
-    # write the table body...
-    html.write('<tbody>')
-
-    for d in iter_dicts:
-        html.write(row % d)
-
-    html.write('</tbody>')
-    html.write('</table>')
-
-    return html.getvalue()
+    return '''
+           <table{classes}>
+             <thead>
+               <tr>{thead}</tr>
+             </thead>
+             <tbody>
+               {tbody}
+             </tbody>
+           </table>
+           '''.format(**table_parts)
 
 
 # The juice ###################################################################
@@ -190,6 +186,8 @@ class FormHandler(object):
                     }
 
             if isinstance(argument_type, list):
+                # could denote select, checkbox, radio
+                # in first element!
                 # build <select> <options> from the list
                 # denoted as the argument type
                 options = argument_type
@@ -341,10 +339,8 @@ def form_handler(*functions, **kwargs):
         evaluation, post_get = handler.evaluate(form)
 
         if post_get:
-            back_to_input = ('<form><input type="submit" '
-                             'value="Back to Form"></form>')
 
-            return evaluation + back_to_input
+            return evaluation + BACK_TO_INPUT
 
         else:
             output += evaluation
