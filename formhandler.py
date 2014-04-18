@@ -54,18 +54,18 @@ FORM = '''
        </form>
        '''
 SELECT = '''
-         <label for="{argument name}">{argument title}</label>
-         <select name="{argument name}" id="{argument name}">
+         <label for="{name}">{title}</label>
+         <select name="{name}" id="{name}">
            {options}
          </select>
          '''
 HTML_INPUT_FIELD = '''
-                   <label for="{argument name}">
-                     {argument title}
+                   <label for="{name}">
+                     {title}
                    </label>
                    <input type="{input type}" 
-                          name="{argument name}"
-                          id="{argument name}">
+                          name="{name}"
+                          id="{name}">
                    <br>
                    '''
 FORM_DESCRIPTION = '''
@@ -188,32 +188,56 @@ class FormHandler(object):
         for argument in self.args + [k for k in self.kwargs]:
             # argument_type may be 'text', 'file', or a Python list,
             # representing options in a select field.
-            argument_type = self.argument_types.get(argument, 'text')
-            parts = {
-                     'argument name': argument,
-                     'argument title': var_title(argument),
-                    }
+            arg = {
+                   'name': argument,
+                   'title': var_title(argument),
+                   'type': self.argument_types.get(argument, 'text'),
+                  }
 
-            if isinstance(argument_type, list):
+            if isinstance(arg['type'], list):
                 # could denote select, checkbox, radio
                 # in first element!
                 # build <select> <options> from the list
                 # denoted as the argument type
-                options = argument_type
-                option = '<option value="%s">%s</option>'
-                options = [option % (o, var_title(o)) for o in options]
-                parts['options'] = '\n'.join(options)
-                new_field = SELECT
+                # first element must be what type of choice selection
+                list_type = arg['type'][0]
+                options = arg['type'][1:]
 
-            elif argument_type in ('text', 'file'):
-                parts['input type'] = argument_type
-                new_field = HTML_INPUT_FIELD
+                if list_type == 'select':
+                    option = '<option value="%s">%s</option>'
+                    options = [option % (o, var_title(o)) for o in options]
+                    arg['options'] = '\n'.join(options)
+                    fields.append(SELECT.format(**arg))
+
+                elif list_type in ['checkbox', 'radio']:
+                    items = []
+
+                    for option in options:
+                        parts = {
+                                 'option': option,
+                                 'list type': list_type,
+                                 'option title': var_title(option),
+                                }
+                        parts.update(arg)
+                        field = '''
+                                <label for="{option}">
+                                  <input type="{list type}" id="{option}"
+                                         name="{name}" value="{option}">
+                                  {option title}
+                                </label>
+                                '''.format(**parts)
+                        items.append(field)
+
+                    fields.append('\n'.join(items))
+
+            elif arg['type'] in ('text', 'file'):
+                parts = {'input type': arg['type']}
+                parts.update(arg)
+                fields.append(HTML_INPUT_FIELD.format(**parts))
 
             else:
 
                 raise Exception('invalid argument type')
-
-            fields.append(new_field.format(**parts))
 
         # build form_parts...
         form_parts = {

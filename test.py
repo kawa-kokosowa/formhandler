@@ -51,7 +51,7 @@ def reflect(upload_file, save_directory=None):
 
 
 # Test!
-types = {'upload_file': 'file', 'save_directory': ['uploads', 'resources'],}
+types = {'upload_file': 'file', 'save_directory': ['select', 'uploads', 'resources'],}
 print('Content-Type: text/html\n')
 print(form_handler(make_uppercase, reflect, reflect=types))
 
