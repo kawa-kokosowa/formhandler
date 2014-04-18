@@ -1,4 +1,4 @@
-#!/usr/local/bin/python
+#!/usr/local/bin/python3.4
 """An example of formhandler's capabilities.
 
 """
@@ -44,7 +44,7 @@ def reflect(upload_file, save_directory=None):
     else:
         path = upload_file.filename
 
-    with file(path, 'wb') as f:
+    with open(path, 'wb') as f:
         f.write(upload_file.file.read())
 
     return '<img src="/%s" alt="user uploaded file" />' % path
@@ -52,6 +52,6 @@ def reflect(upload_file, save_directory=None):
 
 # Test!
 types = {'upload_file': 'file', 'save_directory': ['uploads', 'resources'],}
-print 'Content-Type: text/html\n'
-print form_handler(make_uppercase, reflect, reflect=types)
+print('Content-Type: text/html\n')
+print(form_handler(make_uppercase, reflect, reflect=types))
 

@@ -32,7 +32,11 @@ import os
 import cgi
 import cgitb; cgitb.enable()
 import inspect
-from cStringIO import StringIO
+
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from io import StringIO
 
 
 # CONFIG/CONSTANTS ############################################################
@@ -70,6 +74,11 @@ FORM_DESCRIPTION = '''
                    </section>
                    '''
 BACK_TO_INPUT = '<form><input type="submit" value="Back to Form"></form>'
+ERROR_MISSING_ARGS = '''
+                     <p>
+                       <strong><strong>Error:</strong> missing arguments: %s.
+                     </p>
+                     '''
 
 
 # GENERIC PYTHON DATA > HTML ##################################################
@@ -176,7 +185,7 @@ class FormHandler(object):
         # Create said fields for required_fields and optional_fields.
         fields = []
 
-        for argument in self.args + self.kwargs.keys():
+        for argument in self.args + [k for k in self.kwargs]:
             # argument_type may be 'text', 'file', or a Python list,
             # representing options in a select field.
             argument_type = self.argument_types.get(argument, 'text')
@@ -236,7 +245,7 @@ class FormHandler(object):
         arg_values = ([file_or_text(form, arg) for arg in self.args]
                       if self.args else None)
         kwargs = ({k: file_or_text(form, k) for k in self.kwargs}
-                   if self.kwargs else None)
+                  if self.kwargs else None)
 
         # REQUIRED field missing in POST/GET.
         if None in arg_values:
@@ -247,8 +256,7 @@ class FormHandler(object):
                 if value is None:
                     missing_args.append(self.args[i])
 
-            message = ('<p><strong><strong>Error:</strong> missing '
-                       'arguments: %s.' % ', '.join(missing_args))
+            message = ERROR_MISSING_ARGS % ', '.join(missing_args)
 
             return message, form
 

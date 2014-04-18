@@ -12,47 +12,31 @@ I mean, I'm pretty sure you can make the server execute itself, y'know?
 import os
 import sys
 import webbrowser
-import SocketServer
-import BaseHTTPServer
-import CGIHTTPServer
+
+try:
+    from CGIHTTPServer import CGIHTTPRequestHandler
+    from BaseHTTPServer import HTTPServer
+
+except ImportError:
+    from http.server import HTTPServer, CGIHTTPRequestHandler
 
 
 LISTEN_ADDRESS = ''
 LISTEN_PORT = 8080
 PUBLIC_DIRECTORY = 'www'
+CGI_DIRECTORIES = ['/', 'resources']
 
 
-class ThreadingCGIServer(SocketServer.ThreadingMixIn,
-                   BaseHTTPServer.HTTPServer):
-
-    pass
+class Handler(CGIHTTPRequestHandler):
+    cgi_directories = CGI_DIRECTORIES
 
 
-def httpd():
-    """THIS IS A TOY. It is only here so users may test parsed
-    contents before making them public.
+listen_info = (LISTEN_ADDRESS, LISTEN_PORT)
+httpd = HTTPServer(listen_info, Handler)
 
-    """
+if not LISTEN_ADDRESS:
+    listen_info = ('localhost', LISTEN_PORT)
 
-    handler = CGIHTTPServer.CGIHTTPRequestHandler
-    handler.cgi_directories = ['/', 'resources']
-    listen_info = (LISTEN_ADDRESS, LISTEN_PORT)
-    server = ThreadingCGIServer(listen_info, handler)
-
-    if not LISTEN_ADDRESS:
-        listen_info = ('localhost', LISTEN_PORT)
-
-    webbrowser.open('http://%s:%s/test.py' % listen_info)
-
-    try:
-
-        while 1:
-            sys.stdout.flush()
-            server.handle_request()
-
-    except KeyboardInterrupt:
-        print "Finished"
-
-
-httpd()
+webbrowser.open('http://%s:%s/test.py' % listen_info)
+httpd.serve_forever()
 
