@@ -257,18 +257,24 @@ class FormHandler(object):
         return FORM.format(**form_parts)
 
     def evaluate(self, form):
+        """Evaluate function data and parse as HTML.
+
+        Args:
+          Form: see get_params().
+
+        """
 
         # If the function name is not in POST/GET, we're providing
         # the HTML input form.
-        if form.getvalue(self.name) is None:
+        if self.name not in form:
 
             return self.to_form(), None
 
         # Find corellated arguments in mind. Assume text input,
         # unless noted in arg_map
-        arg_values = ([file_or_text(form, arg) for arg in self.args]
+        arg_values = ([form[arg] for arg in self.args]
                       if self.args else None)
-        kwargs = ({k: file_or_text(form, k) for k in self.kwargs}
+        kwargs = ({k: form[k] for k in self.kwargs}
                   if self.kwargs else None)
 
         # REQUIRED field missing in POST/GET.
@@ -319,37 +325,28 @@ class FormHandler(object):
         raise Exception('Unhandled evaluation type!')
 
 
-def file_or_text(form, form_field):
-    """Will return a cgi.fileitem or the corresponding string
-    for form_field in form.
-
-    Args:
-      form (cgi.FieldStorage): the current cgi field storage
-        session.
-      form_field (str): grab this field's value.
-
-    Returns:
-      str|fileitem: returns string if text field, returns cgi
-        module fileitem if a file.
+def get_params():
+    """Get all fields send in get/post, use a well organized
+    dictionary!
 
     """
 
-    item = form.getvalue(form_field)
+    params = {}
+    fields = cgi.FieldStorage() 
 
-    if item is None:
+    for param in fields.keys():
 
-        return None
+        if fields[param].filename:
+            params[param] = (fields[param].filename, fields[param].file.read())
 
-    # item is a file
-    elif form[form_field].filename:
+            continue
 
-        # this returns the fileitem
-        return form[form_field]
+        item = fields.getvalue(param)
 
-    # item is string or list
-    else:
+        if isinstance(item, list) or isinstance(item, str):
+            params[param] = item
 
-        return item
+    return params
 
 
 def form_handler(*functions, **kwargs):
@@ -362,7 +359,7 @@ def form_handler(*functions, **kwargs):
 
     """
 
-    form = cgi.FieldStorage()
+    form = get_params()
     output = ''
 
     for function in functions:

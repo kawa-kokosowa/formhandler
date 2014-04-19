@@ -14,7 +14,7 @@ def make_uppercase(s):
     Here is another test paragraph.
 
     Args:
-      s (str): string to make uppercase.
+      s (list): list containing string to make uppercase.
 
     """
 
@@ -34,18 +34,20 @@ def reflect(upload_file, save_directory=None):
 
     """
 
+    filename, file_contents = upload_file
+
     if save_directory and save_directory in ('resources', 'uploads'):
 
         if not os.path.exists(save_directory):
             os.makedirs(save_directory)
 
-        path = os.path.join(save_directory, upload_file.filename)
+        path = os.path.join(save_directory, filename)
 
     else:
-        path = upload_file.filename
+        path = filename
 
     with open(path, 'wb') as f:
-        f.write(upload_file.file.read())
+        f.write(file_contents)
 
     return '<img src="/%s" alt="user uploaded file" />' % path
 
