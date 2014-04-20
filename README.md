@@ -24,35 +24,5 @@ Note: you may need to chmod +X the proper cgi scripts. I also may need to change
 
 # Example Usage
 
-Say we want a web interace for these functions (see: test.py):
-
-```python
-def make_uppercase(s):
-    """This description shows up in the form."""
-    return s.upper()
-
-def reflect(upload_file, save_directory=None):
-    """Simply display an uploaded image."""
-
-    if save_directory and save_directory in ('resources', 'uploads'):
-        path = os.path.join(save_directory, upload_file.filename)
-    else:
-        path = upload_file.filename
-
-    with file(path, 'wb') as f:
-        f.write(upload_file.file.read())
-
-    return '<img src="/%s" alt="user uploaded file" />' % path
-```
-
-All we have to to is:
-
-```python
-# overrides default input types; a list is <select>
-types = {'upload_file': 'file', 'save_directory': ['uploads', 'resources'],}
-print 'Content-Type: text/html\n'
-print form_handler(make_uppercase, reflect, reflect=types)
-```
-
-... which will process form input (and output the HTML-friendly evaluation of both make_uppercase and reflect), plus provide us an HTML input form when no POST/GET data is present.
+Just view the source of test.py!
 
