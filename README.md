@@ -1,12 +1,14 @@
 formhandler
 ===========
 
-Automate the development of a web/CGI script interface to a
-function.
+Tested functional with Python 2.7.6 and Python 3.4.
 
-  1. Generates HTML forms: the HTML form(s) the CGI script provides utilizes data about the functions (introspection) to create the HTML form(s) (input interface to functions).
-  2. Handles form(s) data: Each POST/GET field from the aforementioned form(s) is sent to its respective function and argument.
-  3. Presents evaluations: the evaluation(s) of step #2 is then HTML-ified, and returned (output interface).
+Automate the development of a web/CGI script interface to a function.
+
+In a couple of commands, in one CGI script, use a function to:
+
+1. Provide an HTML form interface for that function.
+2. Provide the HTML-ified evaluation of sending corresponding POST/GET fields to aforementioned function.
 
 # In other words...
 
