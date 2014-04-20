@@ -15,7 +15,7 @@ Includes tools for automatically converting data returned from a function, to HT
 # Get started:
 
 1. python setup.py install
-2. Launch testhttpd.py. This acts as a temporary testing web server. It should launch http://127.0.0.1:8080/ for you.
+2. Launch testhttpd.py. This acts as a temporary testing web server. It should launch http://localhost:8080/ in a new web browser tab.
 3. Open test.py in a file editor to see what's going on!
 
 Note: you may need to chmod +X the proper cgi scripts. I also may need to change file headers to #!/usr/bin/python. You need to create the uploads and resources directory for the demo. Just make demo directory.
