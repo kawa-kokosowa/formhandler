@@ -4,14 +4,15 @@ Lillian Lynn Mahoney
 """
 
 import os
+from formhandler import form_handler
 
 
 TEMPLATE_ROOT = 'tpl'
 
 
-def template(replacements, head_filename=None, foot_filename=None):
-    """Pass
-    
+def template(*args, head_filename=None, foot_filename=None, replacements=None):
+    """A simple way to generate forms.
+
     Args:
       head_filename (str):
       foot_filename (str):
@@ -28,9 +29,13 @@ def template(replacements, head_filename=None, foot_filename=None):
               'title': '',
               'within head': '',
              }
-    pieces.update(replacements)
+
+    if replacements:
+        pieces.update(replacements)
+
     pieces['head'] = head.format(**pieces)
     pieces['foot'] = foot.format(**pieces)
+    pieces['content'] = form_handler(*args)
 
     return '''
            {head}

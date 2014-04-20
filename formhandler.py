@@ -158,10 +158,14 @@ def iter_dicts_table(iter_dicts, classes=None, check=False):
 
 class FormHandler(object):
 
-    def __init__(self, function, argument_types=None):
+    def __init__(self, function):
         self.function = function
         self.name = function.__name__
-        self.argument_types = argument_types or {}
+
+        if hasattr(function, 'field_types'):
+            self.field_types = function.field_types
+        else:
+            self.field_types = {}
 
         args, __, kwargs, __ = inspect.getargspec(function)
         self.args = args or []
@@ -190,7 +194,7 @@ class FormHandler(object):
             arg = {
                    'name': argument,
                    'title': var_title(argument),
-                   'type': self.argument_types.get(argument, 'text'),
+                   'type': self.field_types.get(argument, 'text'),
                   }
 
             if isinstance(arg['type'], list):
@@ -348,12 +352,12 @@ def get_params():
     return params
 
 
-def form_handler(*functions, **kwargs):
+def form_handler(*args):
     """Just form_handler for multiple functions, while returning
     ONLY the function evaluation on POST/GET.
 
     Args:
-      **kwargs: function_name: dictionary. Dictionary is argument
+      mapping (dict): function: dictionary. Dictionary is argument
         to type mapping...
 
     """
@@ -361,9 +365,8 @@ def form_handler(*functions, **kwargs):
     form = get_params()
     output = ''
 
-    for function in functions:
+    for function in args:
         handler = FormHandler(function)
-        handler.argument_types = kwargs.get(handler.name, {})
         evaluation, post_get = handler.evaluate(form)
 
         if post_get:
