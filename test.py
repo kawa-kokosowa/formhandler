@@ -4,6 +4,7 @@
 """
 
 from formhandler import form_handler
+from tpl import template
 import os
 
 
@@ -54,6 +55,8 @@ def reflect(upload_file, save_directory=None):
 
 # Test!
 types = {'upload_file': 'file', 'save_directory': ['select', 'uploads', 'resources'],}
+content = form_handler(make_uppercase, reflect, reflect=types)
+
 print('Content-Type: text/html\n')
-print(form_handler(make_uppercase, reflect, reflect=types))
+print(template({'content': content, 'title': 'Demo Page'}))
 

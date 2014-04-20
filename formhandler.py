@@ -21,10 +21,10 @@ SUMMARY:
   function, to HTML, e.g., dict > html, list > html, etc.
 
 DEVELOPER NOTES:
-  - Makes heavy usage of the "cgi" module.
   - Needs some prettification; will probably use BeautifulSoup...
   - Soon I'll include an example which is a SQLITE3 table editor.
-  - I always try to do templating LAST (the .format() part).
+  - Will have automatic form validation (for defined argument data
+    types).
 
 """
 
@@ -43,13 +43,13 @@ except ImportError:
 
 
 FORM = '''
-       <form enctype="multipart/form-data" method="post">
+       <form enctype="multipart/form-data" method="post" class="formhandler">
          <fieldset>
            <legend>{title}</legend>
            {about}
            {hidden trigger field}
            {fields}
-           <input type="submit" value="Process: {title}">
+           <input type="submit" value="submit">
          </fieldset>
        </form>
        '''
@@ -66,19 +66,18 @@ HTML_INPUT_FIELD = '''
                    <input type="{input type}" 
                           name="{name}"
                           id="{name}">
-                   <br>
                    '''
 FORM_DESCRIPTION = '''
                    <section class="form-help">
                      <pre>{0}</pre>
                    </section>
                    '''
-BACK_TO_INPUT = '<form><input type="submit" value="Back to Form"></form>'
-ERROR_MISSING_ARGS = '''
-                     <p>
-                       <strong><strong>Error:</strong> missing arguments: %s.
-                     </p>
-                     '''
+BACK_TO_INPUT = '''
+                <form class="formhandler">
+                  <input type="submit" value="Back to Form">
+                </form>
+                '''
+ERROR_MISSING_ARGS = '<p><strong>Error:</strong> missing arguments: %s.</p>'
 
 
 # GENERIC PYTHON DATA > HTML ##################################################
