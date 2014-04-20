@@ -3,7 +3,7 @@
 
 """
 
-from tpl import template
+from formhandler.tpl import template
 import os
 
 

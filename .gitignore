@@ -1,4 +1,7 @@
 *.pyc
 *.swp
-uploads/
 *.core
+*.jpg
+*.png
+*.jpeg
+*.gif

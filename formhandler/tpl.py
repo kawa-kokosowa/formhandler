@@ -4,7 +4,7 @@ Lillian Lynn Mahoney
 """
 
 import os
-from formhandler import form_handler
+from formhandler.formhandler import form_handler
 
 
 TEMPLATE_ROOT = 'tpl'
