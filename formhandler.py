@@ -159,6 +159,14 @@ def iter_dicts_table(iter_dicts, classes=None, check=False):
 class FormHandler(object):
 
     def __init__(self, function):
+        """Automate HTML interfaces to Python functions.
+
+        function (func): the function to interface with. I suggest you
+          assign function.field_types, since the default field type
+          is a text input field.
+
+        """
+
         self.function = function
         self.name = function.__name__
 
@@ -170,6 +178,9 @@ class FormHandler(object):
         args, __, kwargs, __ = inspect.getargspec(function)
         self.args = args or []
         self.kwargs = kwargs or {}
+
+        self.evaluation = None
+        self.params = None
 
     def to_form(self):
         """Returns the HTML input form for a function.
@@ -265,13 +276,18 @@ class FormHandler(object):
         Args:
           Form: see get_params().
 
+        Returns:
+          None: sets self.params, self.evaluation
+
         """
 
         # If the function name is not in POST/GET, we're providing
         # the HTML input form.
         if self.name not in form:
+            self.evaluation = self.to_form()
+            self.params = None
 
-            return self.to_form(), None
+            return None
 
         # Find corellated arguments in mind. Assume text input,
         # unless noted in arg_map
@@ -290,8 +306,10 @@ class FormHandler(object):
                     missing_args.append(self.args[i])
 
             message = ERROR_MISSING_ARGS % ', '.join(missing_args)
+            self.evaluation = message
+            self.params = form
 
-            return message, form
+            return None
 
         if arg_values and kwargs:
             evaluation = self.function(*arg_values, **kwargs)
@@ -305,8 +323,10 @@ class FormHandler(object):
 
         # ... Evaluation is a string; just use paragraph formatting.
         if isinstance(evaluation, str):
+            self.evaluation = paragraphs(evaluation)
+            self.params = form
 
-            return paragraphs(evaluation), form
+            return None
 
         # ... Evaluation is iterable sequence; further options below...
         elif (isinstance(evaluation, list)
@@ -317,11 +337,14 @@ class FormHandler(object):
                 possible_table = iter_dicts_table(evaluation)
 
                 if possible_table:
+                    self.evaluation = paragraphs(evaluation)
+                    self.params = form
 
-                    return possible_table, form
+                    return None
 
         # Evaluation is simply a dictionary! Create a definition list.
         elif isinstance(evaluation, dict):
+
             pass
 
         # This SHOULDN'T be possible.
@@ -357,8 +380,7 @@ def form_handler(*args):
     ONLY the function evaluation on POST/GET.
 
     Args:
-      mapping (dict): function: dictionary. Dictionary is argument
-        to type mapping...
+      *args: functions to be interfaced with.
 
     """
 
@@ -367,14 +389,14 @@ def form_handler(*args):
 
     for function in args:
         handler = FormHandler(function)
-        evaluation, post_get = handler.evaluate(form)
+        handler.evaluate(form)
 
-        if post_get:
+        if handler.params:
 
-            return evaluation + BACK_TO_INPUT
+            return handler.evaluation + BACK_TO_INPUT
 
         else:
-            output += evaluation
+            output += handler.evaluation
 
     return output
 
