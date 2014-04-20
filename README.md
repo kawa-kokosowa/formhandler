@@ -10,10 +10,6 @@ In a couple of commands, in one CGI script, use a function to:
 1. Provide an HTML form interface for that function.
 2. Provide the HTML-ified evaluation of sending corresponding POST/GET fields to aforementioned function.
 
-# In other words...
-
-Pipe input from web form to a Python function, pipe output back to a web page. Make this process require as little code as possible.
-
 Includes tools for automatically converting data returned from a function, to HTML, e.g., dict > html, list > html, etc.
 
 # Get started:
