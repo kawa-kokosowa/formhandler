@@ -55,8 +55,9 @@ def reflect(upload_file, save_directory=None):
 
 # Configure HTML/argument relations
 relations = ArgRelations(reflect)
-relations.add('upload_file', 'file', label='File to upload&hellip;')
-relations.add('save_directory', 'select', ['uploads', 'resources'])
+relations.add('upload_file', field_type='file', label='File to upload&hellip;')
+relations.add('save_directory', field_type='select',
+              options=['uploads', 'resources'])
 
 relations = ArgRelations(make_uppercase)
 relations.add('s', label='Text to transform')

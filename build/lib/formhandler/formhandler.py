@@ -161,7 +161,7 @@ def iter_dicts_table(iter_dicts, classes=None, check=False):
 class Field(object):
 
     def __init__(self, name, field_type=None, options=None, label=None,
-                 argument=None):
+                argument=None):
         self.field_type = field_type or 'text'
         self.options = options
         self.argument = argument or name
