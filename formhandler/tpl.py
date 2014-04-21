@@ -4,13 +4,13 @@ Lillian Lynn Mahoney
 """
 
 import os
-from formhandler.formhandler import form_handler
 
 
 TEMPLATE_ROOT = 'tpl'
 
 
-def template(*args, head_filename=None, foot_filename=None, replacements=None):
+def template(content, head_filename=None, foot_filename=None,
+             replacements=None):
     """A simple way to generate forms.
 
     Args:
@@ -35,7 +35,7 @@ def template(*args, head_filename=None, foot_filename=None, replacements=None):
 
     pieces['head'] = head.format(**pieces)
     pieces['foot'] = foot.format(**pieces)
-    pieces['content'] = form_handler(*args)
+    pieces['content'] = content
 
     return '''
            {head}

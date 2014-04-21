@@ -285,7 +285,7 @@ class FuncPrep(object):
         return None
 
 
-class FormHandler(object):
+class Form(object):
 
     def __init__(self, function):
         """Automate HTML interfaces to Python functions.
@@ -300,7 +300,7 @@ class FormHandler(object):
         self.function = function
 
         if not hasattr(function, 'fields'):
-            relations = ArgRelations(function)
+            relations = FuncPrep(function)
 
         self.evaluation = None
         self.params = None
@@ -425,28 +425,36 @@ class FormHandler(object):
         raise Exception('Unhandled evaluation type!')
 
 
-def form_handler(*args):
-    """Just form_handler for multiple functions, while returning
-    ONLY the function evaluation on POST/GET.
+def FormHandler(object):
 
-    Args:
-      *args: functions to be interfaced with.
+    def __init__(self, *args):
+        """Note: move TPL bull over here?"""
+        self.functions = args
+        self.relations = {}
 
-    """
+        for function in args:
+            form = FuncPrep(function)
+            setattr(self, form.function.name, form)
 
-    form = get_params()
-    output = ''
+    def html(self, replacements=None):
+        """Just form_handler for multiple functions, while returning
+        ONLY the function evaluation on POST/GET.
 
-    for function in args:
-        handler = FormHandler(function)
-        handler.evaluate(form)
+        """
 
-        if handler.params:
+        form = get_params()
+        output = ''
 
-            return handler.evaluation + BACK_TO_INPUT
+        for function in self.functions:
+            handler = Form(function)
+            handler.evaluate(form)
 
-        else:
-            output += handler.evaluation
+            if handler.params:
 
-    return output
+                return handler.evaluation + BACK_TO_INPUT
+
+            else:
+                output += handler.evaluation
+
+        return output
 

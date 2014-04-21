@@ -4,7 +4,7 @@
 """
 
 from formhandler.tpl import template
-from formhandler.formhandler import FuncPrep
+from formhandler.formhandler import FormHandler
 import os
 
 
@@ -54,17 +54,16 @@ def reflect(upload_file, save_directory=None):
 
 
 # Configure HTML/argument relations
-funcprep = FuncPrep(reflect)
-funcprep('upload_file', field_type='file', label='File to upload&hellip;')
-funcprep('save_directory', field_type='select',
-         options=['uploads', 'resources'])
+handler = FormHandler(reflect, make_uppercase)
+handler.reflect('upload_file', field_type='file',
+                label='File to upload&hellip;')
+handler.reflect('save_directory', field_type='select',
+                options=['uploads', 'resources'])
+handler.make_uppercase('s', label='Text to transform')
+replacements={'title': 'Demo Form'}
+content = handler.html(replacements)
+content = template(content, replacements={'title': 'Demo Form'})
 
-funcprep = FuncPrep(make_uppercase)
-funcprep('s', label='Text to transform')
-
-# Output!
-content = template(reflect, make_uppercase,
-                   replacements={'title': 'Demo Form'})
 print('Content-Type: text/html\n')
 print(content)
 
