@@ -222,13 +222,15 @@ class ArgRelations(object):
         """Automate the relations between HTML input fields and
         the function arguments themselves.
 
-        TODO:
-          - Handle HTML representation of a field/argument?
-
         """
 
         self.function = function
+        self.function.name = function.__name__
         self.function.fields = {}
+
+        args, __, kwargs, __ = inspect.getargspec(self.function)
+        self.function.args = args or []
+        self.function.kwargs = kwargs or {}
 
     def add(self, name, **kwargs):
         """Relate an HTML field to an argument.
@@ -252,36 +254,20 @@ class FormHandler(object):
     def __init__(self, function):
         """Automate HTML interfaces to Python functions.
 
-        function (func): the function to interface with. I suggest you
-          assign function.field_types, since the default field type
-          is a text input field.
+        Args:
+          function (func): the function to interface with. I suggest you
+            assign function.field_types, since the default field type
+            is a text input field.
 
         """
 
         self.function = function
-        self.name = function.__name__
 
-        if hasattr(function, 'fields'):
-            self.fields = function.fields
-        else:
-            self.fields = {}
-
-        args, __, kwargs, __ = inspect.getargspec(function)
-        self.args = args or []
-        self.kwargs = kwargs or {}
+        if not hasattr(function, 'fields'):
+            relations = ArgRelations(function)
 
         self.evaluation = None
         self.params = None
-
-    def field_meta(self, argument, key):
-
-        if argument in self.fields and key in self.fields[argument]:
-
-            return self.fields[argument][key]
-
-        else:
-
-            return None
 
     def to_form(self):
         """Returns the HTML input form for a function.
@@ -293,17 +279,18 @@ class FormHandler(object):
         """
 
         # Form configuration/pre-setup.
-        title = var_title(self.name)
+        title = var_title(self.function.name)
 
         # Create HTML input labels and respective fields,
         # based on (keyword) argument names and arg_map (above).
         # Create said fields for required_fields and optional_fields.
         fields = []
+        kwargs_keys = [k for k in self.function.kwargs]
 
-        for argument_name in self.args + [k for k in self.kwargs]:
+        for argument_name in (self.function.args + kwargs_keys):
 
-            if argument_name in self.fields:
-                fields.append(self.fields[argument_name].to_html())
+            if argument_name in self.function.fields:
+                fields.append(self.function.fields[argument_name].to_html())
             else:
                 fields.append(Field(argument_name).to_html())
 
@@ -319,7 +306,7 @@ class FormHandler(object):
                       # evaluation of the function upon form submission!
                       'hidden trigger field': ('<input type="hidden" id="{0}"'
                                                'name="{0}" value="true">'
-                                               .format(self.name)),
+                                               .format(self.function.name)),
                      }
 
         return FORM.format(**form_parts)
@@ -337,7 +324,7 @@ class FormHandler(object):
 
         # If the function name is not in POST/GET, we're providing
         # the HTML input form.
-        if self.name not in form:
+        if self.function.name not in form:
             self.evaluation = self.to_form()
             self.params = None
 
@@ -345,10 +332,10 @@ class FormHandler(object):
 
         # Find corellated arguments in mind. Assume text input,
         # unless noted in arg_map
-        arg_values = ([form[arg] for arg in self.args]
-                      if self.args else None)
-        kwargs = ({k: form[k] for k in self.kwargs}
-                  if self.kwargs else None)
+        arg_values = ([form[arg] for arg in self.function.args]
+                      if self.function.args else None)
+        kwargs = ({k: form[k] for k in self.function.kwargs}
+                  if self.function.kwargs else None)
 
         # REQUIRED field missing in POST/GET.
         if None in arg_values:
