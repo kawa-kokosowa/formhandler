@@ -12,7 +12,7 @@ In a couple of commands, in one CGI script, use a function to:
 
 Includes tools for automatically converting data returned from a function, to HTML, e.g., dict > html, list > html, etc.
 
-Written because I hate making "web interfaces" for data automation stuff at work (I do business logistics automation). Allowing you to use function(s) to generate HTML input form(s) AND handle displaying function output to the user, with one command.
+Written because I hate making/maintaining "web interfaces" for data automation stuff at work (I do business logistics automation). Allowing you to use function(s) to generate HTML input form(s) AND handle displaying function output to the user, with one command.
 
 # Get started:
 

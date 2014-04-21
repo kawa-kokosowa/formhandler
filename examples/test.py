@@ -22,7 +22,7 @@ def make_uppercase(s):
     return s.upper()
 
 
-def reflect(upload_file, save_directory=None):
+def reflect(upload_file, save_directory):
     """Simply display an image from path.
 
     Lets formhandler do the image saving part.
@@ -61,6 +61,8 @@ handler.reflect('save_directory', field_type='select',
                 options=['uploads', 'resources'])
 handler.make_uppercase('s', label='Text to transform')
 replacements={'title': 'Demo Form'}
+
+# Output content/page
 content = handler.html(replacements)
 content = template(content, replacements={'title': 'Demo Form'})
 

@@ -2,23 +2,23 @@
 """formhandler: sometimes the web interface is an afterthought.
 Lillian Lynn Mahoney
 
-Automate the development of a web/CGI script interface to a
-function.
+Automate the development of a web/CGI script interface to a function.
 
-  1. Generates HTML forms: the HTML form(s) the CGI script provides
-     utilizes data about the functions (introspection) to create
-     the HTML form(s) (input interface to functions).
-  2. Handles form(s) data: Each POST/GET field from the aforementioned
-     form(s) is sent to its respective function and argument.
-  3. Presents evaluations: the evaluation(s) of step #2 is then
-     HTML-ified, and returned (output interface).
+Tested functional with Python 2.7.6 and Python 3.4.
 
-SUMMARY:
-  Pipe input from web form to a Python function, pipe output back to a
-  web page. Make this process require as little code as possible.
+In a couple of commands, in one CGI script, use a function to:
 
-  Includes tools for automatically converting data returned from a
-  function, to HTML, e.g., dict > html, list > html, etc.
+  1. Provide an HTML form interface for that function.
+  2. Provide the HTML-ified evaluation of sending corresponding
+     POST/GET fields to aforementioned function(s).
+
+Includes tools for automatically converting data returned from a
+function, to HTML, e.g., dict > html, list > html, etc.
+
+Written because I hate making "web interfaces" for data automation
+stuff at work (I do business logistics automation). Allowing you to
+use function(s) to generate HTML input form(s) AND handle displaying
+function output to the user, with one command.
 
 DEVELOPER NOTES:
   - Needs some prettification; will probably use BeautifulSoup...
@@ -57,8 +57,10 @@ FORM = '''
        '''
 SELECT = '''
          <label for="{name}">{label}</label>
-         <select name="{name}" id="{name}">
-           {options}
+         <select name="{name}" id="{name}"{required}>
+           <optgroup label="{label}&hellip;">
+             {options}
+           </optgroup>
          </select>
          '''
 HTML_INPUT_FIELD = '''
@@ -67,7 +69,7 @@ HTML_INPUT_FIELD = '''
                    </label>
                    <input type="{input type}" 
                           name="{name}"
-                          id="{name}">
+                          id="{name}"{required}>
                    '''
 FORM_DESCRIPTION = '''
                    <section class="form-help">
@@ -184,8 +186,8 @@ def get_params():
 
 class Field(object):
 
-    def __init__(self, name, field_type=None, options=None, label=None,
-                 argument=None):
+    def __init__(self, function, name, field_type=None, options=None,
+                 label=None, argument=None, required=False):
         """HTML representation of an argument.
 
         Extends function argument meta data.
@@ -197,14 +199,23 @@ class Field(object):
         self.argument = argument or name
         self.label = label or var_title(name)
 
+        if self.argument in function.args:
+            self.required = True
+        else:
+            self.required = required
+
     def __str__(self):
 
         return self.to_html()
 
     def to_html(self):
         fields = []
-        arg = {'name': self.argument, 'type': self.field_type,
-               'label': self.label}
+        arg = {
+               'name': self.argument,
+               'type': self.field_type,
+               'label': self.label,
+               'required': ' required' if self.required else ' ',
+              }
 
         if self.field_type == 'select':
             option = '<option value="%s">%s</option>'
@@ -279,7 +290,7 @@ class FuncPrep(object):
         """
 
         # should use Field()
-        field = Field(name, **kwargs)
+        field = Field(self.function, name, **kwargs)
         self.function.fields.update({field.argument: field})
 
         return None
@@ -325,7 +336,7 @@ class Form(object):
             if argument_name in self.function.fields:
                 fields.append(self.function.fields[argument_name].to_html())
             else:
-                fields.append(Field(argument_name).to_html())
+                fields.append(Field(self.function, argument_name).to_html())
 
         # build form_parts...
         form_parts = {
