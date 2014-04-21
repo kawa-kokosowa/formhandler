@@ -8,7 +8,7 @@ Automate the development of a web/CGI script interface to a function.
 In a couple of commands, in one CGI script, use a function to:
 
 1. Provide an HTML form interface for that function.
-2. Provide the HTML-ified evaluation of sending corresponding POST/GET fields to aforementioned function.
+2. Provide the HTML-ified evaluation of sending corresponding POST/GET fields to aforementioned function(s).
 
 Includes tools for automatically converting data returned from a function, to HTML, e.g., dict > html, list > html, etc.
 

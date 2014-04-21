@@ -25,6 +25,8 @@ DEVELOPER NOTES:
   - Soon I'll include an example which is a SQLITE3 table editor.
   - Will have automatic form validation (for defined argument data
     types).
+  - Should mark arg fields as required!
+  - Needs kwarg and arg support!
 
 """
 
@@ -54,14 +56,14 @@ FORM = '''
        </form>
        '''
 SELECT = '''
-         <label for="{name}">{title}</label>
+         <label for="{name}">{label}</label>
          <select name="{name}" id="{name}">
            {options}
          </select>
          '''
 HTML_INPUT_FIELD = '''
                    <label for="{name}">
-                     {title}
+                     {label}
                    </label>
                    <input type="{input type}" 
                           name="{name}"
@@ -156,6 +158,48 @@ def iter_dicts_table(iter_dicts, classes=None, check=False):
 # The juice ###################################################################
 
 
+class ArgRelations(object):
+
+    def __init__(self, function):
+        """Automate the relations between HTML input fields and
+        the function arguments themselves.
+
+        TODO:
+          - Handle HTML representation of a field/argument?
+
+        """
+
+        self.function = function
+        self.function.fields = {}
+
+    def add(self, name, field_type=None, options=None, label=None,
+            argument=None):
+        """Relate an HTML field to an argument.
+
+        The data is actually primarily about the HTML field itself!
+
+        Args:
+          name (str): The name attribute value for the HTML field.
+          field_type (str):
+          html_field_options (list|None):
+          label (str|None):
+          argument (str|None):
+
+        """
+
+        argument = argument or name
+        field_relations = {
+                           'name': name,
+                           'type': field_type or 'text',
+                           'options': options,
+                           'label': label,
+                           'argument_name': argument,
+                          }
+        self.function.fields.update({argument: field_relations})
+
+        return None
+
+
 class FormHandler(object):
 
     def __init__(self, function):
@@ -170,10 +214,10 @@ class FormHandler(object):
         self.function = function
         self.name = function.__name__
 
-        if hasattr(function, 'field_types'):
-            self.field_types = function.field_types
+        if hasattr(function, 'fields'):
+            self.fields = function.fields
         else:
-            self.field_types = {}
+            self.fields = {}
 
         args, __, kwargs, __ = inspect.getargspec(function)
         self.args = args or []
@@ -181,6 +225,16 @@ class FormHandler(object):
 
         self.evaluation = None
         self.params = None
+
+    def field_meta(self, argument, key):
+
+        if argument in self.fields and key in self.fields[argument]:
+
+            return self.fields[argument][key]
+
+        else:
+
+            return None
 
     def to_form(self):
         """Returns the HTML input form for a function.
@@ -199,59 +253,49 @@ class FormHandler(object):
         # Create said fields for required_fields and optional_fields.
         fields = []
 
-        for argument in self.args + [k for k in self.kwargs]:
-            # argument_type may be 'text', 'file', or a Python list,
-            # representing options in a select field.
-            arg = {
-                   'name': argument,
-                   'title': var_title(argument),
-                   'type': self.field_types.get(argument, 'text'),
-                  }
+        for argument_name in self.args + [k for k in self.kwargs]:
+            arg_type = self.field_meta(argument_name, 'type') or 'text'
+            arg_title = var_title(argument_name)
+            label = self.field_meta(argument_name, 'label') or arg_title
+            arg = {'name': argument_name, 'type': arg_type, 'label': label}
 
-            if isinstance(arg['type'], list):
-                # could denote select, checkbox, radio
-                # in first element!
-                # build <select> <options> from the list
-                # denoted as the argument type
-                # first element must be what type of choice selection
-                list_type = arg['type'][0]
-                options = arg['type'][1:]
+            if arg_type == 'select':
+                option = '<option value="%s">%s</option>'
+                options = self.field_meta(argument_name, 'options')
+                options = [option % (o, var_title(o)) for o in options]
+                arg['options'] = '\n'.join(options)
+                fields.append(SELECT.format(**arg))
 
-                if list_type == 'select':
-                    option = '<option value="%s">%s</option>'
-                    options = [option % (o, var_title(o)) for o in options]
-                    arg['options'] = '\n'.join(options)
-                    fields.append(SELECT.format(**arg))
+            elif arg_type in ['checkbox', 'radio']:
+                items = []
 
-                elif list_type in ['checkbox', 'radio']:
-                    items = []
+                for option in self.field_meta(argument, 'options'):
+                    parts = {
+                             'option': option,
+                             'list type': list_type,
+                             'option title': var_title(option),
+                            }
+                    parts.update(arg)
+                    field = '''
+                            <label for="{option}">
+                              <input type="{list type}" id="{option}"
+                                     name="{name}" value="{option}">
+                              {option title}
+                            </label>
+                            '''.format(**parts)
+                    items.append(field)
 
-                    for option in options:
-                        parts = {
-                                 'option': option,
-                                 'list type': list_type,
-                                 'option title': var_title(option),
-                                }
-                        parts.update(arg)
-                        field = '''
-                                <label for="{option}">
-                                  <input type="{list type}" id="{option}"
-                                         name="{name}" value="{option}">
-                                  {option title}
-                                </label>
-                                '''.format(**parts)
-                        items.append(field)
+                fields.append('\n'.join(items))
 
-                    fields.append('\n'.join(items))
-
-            elif arg['type'] in ('text', 'file'):
-                parts = {'input type': arg['type']}
+            elif arg_type in ('text', 'file'):
+                parts = {'input type': arg_type}
                 parts.update(arg)
                 fields.append(HTML_INPUT_FIELD.format(**parts))
 
             else:
 
-                raise Exception('invalid argument type')
+                raise Exception(('invalid arg type for %s' % argument_name,
+                                  arg['type'],))
 
         # build form_parts...
         form_parts = {
