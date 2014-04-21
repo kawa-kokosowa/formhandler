@@ -425,7 +425,7 @@ class Form(object):
         raise Exception('Unhandled evaluation type!')
 
 
-def FormHandler(object):
+class FormHandler(object):
 
     def __init__(self, *args):
         """Note: move TPL bull over here?"""
