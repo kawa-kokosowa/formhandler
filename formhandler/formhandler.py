@@ -158,10 +158,40 @@ def iter_dicts_table(iter_dicts, classes=None, check=False):
 # The juice ###################################################################
 
 
+def get_params():
+    """Get all fields send in get/post, use a well organized
+    dictionary!
+
+    """
+
+    params = {}
+    fields = cgi.FieldStorage() 
+
+    for param in fields.keys():
+
+        if fields[param].filename:
+            params[param] = (fields[param].filename, fields[param].file.read())
+
+            continue
+
+        item = fields.getvalue(param)
+
+        if isinstance(item, list) or isinstance(item, str):
+            params[param] = item
+
+    return params
+
+
 class Field(object):
 
     def __init__(self, name, field_type=None, options=None, label=None,
                  argument=None):
+        """HTML representation of an argument.
+
+        Extends function argument meta data.
+
+        """
+
         self.field_type = field_type or 'text'
         self.options = options
         self.argument = argument or name
@@ -216,11 +246,17 @@ class Field(object):
         return '\n'.join(fields)
 
 
-class ArgRelations(object):
+class FuncPrep(object):
 
     def __init__(self, function):
-        """Automate the relations between HTML input fields and
+        """Prepares a function so that it may be used to generate
+        forms with form_handler()/FormHandler().
+
+        Automate the relations between HTML input fields and
         the function arguments themselves.
+
+        Conform meta data about a function, as attributes of that
+        function.
 
         """
 
@@ -232,7 +268,7 @@ class ArgRelations(object):
         self.function.args = args or []
         self.function.kwargs = kwargs or {}
 
-    def add(self, name, **kwargs):
+    def __call__(self, name, **kwargs):
         """Relate an HTML field to an argument.
 
         The data is actually primarily about the HTML field itself!
@@ -278,9 +314,6 @@ class FormHandler(object):
 
         """
 
-        # Form configuration/pre-setup.
-        title = var_title(self.function.name)
-
         # Create HTML input labels and respective fields,
         # based on (keyword) argument names and arg_map (above).
         # Create said fields for required_fields and optional_fields.
@@ -296,7 +329,7 @@ class FormHandler(object):
 
         # build form_parts...
         form_parts = {
-                      'title': title or '',
+                      'title': var_title(self.function.name),
                       'fields': '\n'.join(fields),
 
                       # Section describing this form, based on docstring.
@@ -390,30 +423,6 @@ class FormHandler(object):
 
         # This SHOULDN'T be possible.
         raise Exception('Unhandled evaluation type!')
-
-
-def get_params():
-    """Get all fields send in get/post, use a well organized
-    dictionary!
-
-    """
-
-    params = {}
-    fields = cgi.FieldStorage() 
-
-    for param in fields.keys():
-
-        if fields[param].filename:
-            params[param] = (fields[param].filename, fields[param].file.read())
-
-            continue
-
-        item = fields.getvalue(param)
-
-        if isinstance(item, list) or isinstance(item, str):
-            params[param] = item
-
-    return params
 
 
 def form_handler(*args):
