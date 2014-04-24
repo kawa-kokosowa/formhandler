@@ -55,8 +55,13 @@ FORM = '''
          </fieldset>
        </form>
        '''
+FIELD_DESCRIPTION = '''
+                    <div class="fhandler-field_desc">
+                      <label for="{name}">{label}</label>
+                      <p class="fhandler-field_desc-help">{help}</p>
+                    </div>
+                    '''
 SELECT = '''
-         <label for="{name}">{label}{help}</label>
          <select name="{name}" id="{name}"{required}>
            <optgroup label="{label}&hellip;">
              {options}
@@ -64,10 +69,6 @@ SELECT = '''
          </select>
          '''
 HTML_INPUT_FIELD = '''
-                   <label for="{name}">
-                     {label}
-                     {help}
-                   </label>
                    <input type="{input type}" 
                           name="{name}"
                           id="{name}"{required}>
@@ -214,7 +215,8 @@ class Field(object):
         self.options = options
         self.argument = argument or name
         self.label = label or var_title(name)
-        self.help_text = '<p>' + help_text + '</p>' if help_text else ''
+        self.help_text = ('<p>' + help_text + '</p>'
+                          if help_text else ' ')
 
         if self.argument in function.args:
             self.required = True
@@ -239,7 +241,7 @@ class Field(object):
             options = [option % (o, var_title(o)) for o in self.options]
             arg['options'] = '\n'.join(options)
 
-            return SELECT.format(**arg)
+            return (FIELD_DESCRIPTION + SELECT).format(**arg)
 
         elif self.field_type in ['checkbox', 'radio']:
             items = []
@@ -251,7 +253,7 @@ class Field(object):
                          'option title': var_title(option),
                         }
                 parts.update(arg)
-                field = HTML_INPUT_FIELD.format(**parts)
+                field = (FIELD_DESCRIPTION + HTML_INPUT_FIELD).format(**parts)
                 items.append(field)
 
             return '\n'.join(items)
@@ -261,7 +263,7 @@ class Field(object):
             parts = {'input type': self.field_type}
             parts.update(arg)
 
-            return HTML_INPUT_FIELD.format(**parts)
+            return (FIELD_DESCRIPTION + HTML_INPUT_FIELD).format(**parts)
 
         else:
 
