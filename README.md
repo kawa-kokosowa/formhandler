@@ -12,7 +12,7 @@ In a couple of commands, in one CGI script, use a function to:
 
 Includes tools for automatically converting data returned from a function, to HTML, e.g., dict > html, list > html, etc.
 
-Written because I hate making/maintaining "web interfaces" for data automation stuff at work (I do business logistics automation). Allowing you to use function(s) to generate HTML input form(s) AND handle displaying function output to the user, with one command.
+I was tired of making and updating  web interfaces to various scripts I've written at work. Various people use various scripts through super simple CGI scripts.
 
 # Get started:
 
@@ -21,8 +21,4 @@ Written because I hate making/maintaining "web interfaces" for data automation s
 3. Open test.py in a file editor to see what's going on!
 
 Note: you may need to chmod +X the proper cgi scripts. I also may need to change file headers to #!/usr/bin/python. You need to create the uploads and resources directory for the demo. Just make demo directory.
-
-# Example Usage
-
-Just view the source of test.py!
 

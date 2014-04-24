@@ -58,11 +58,12 @@ handler = FormHandler(reflect, make_uppercase)
 handler.reflect('upload_file', field_type='file',
                 label='File to upload&hellip;')
 handler.reflect('save_directory', field_type='select',
-                options=['uploads', 'resources'])
+                options=['uploads', 'resources'],
+                help_text='The directory to upload to.')
 handler.make_uppercase('s', label='Text to transform')
-replacements={'title': 'Demo Form'}
 
 # Output content/page
+replacements = {'title': 'Demo Form'}
 content = handler.html(replacements)
 content = template(content, replacements={'title': 'Demo Form'})
 

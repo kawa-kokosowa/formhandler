@@ -29,6 +29,7 @@ body {
 }
 
 /* auto generated fields */
+
 .formhandler fieldset {
     border: none;
     /* border-top: 2px solid #c74375; */
@@ -53,33 +54,71 @@ body {
     overflow-x: auto;
     max-width: 460px;
     font-size: 0.825rem;
-    background: #f9f9f9;
+    background: #f6f6f6;
     padding: 0.75rem 10px;
     margin: 1.5rem 0;
 }
 
-.formhandler input[type=text],
-.formhandler input[type=file],
-.formhandler select,
-.formhandler label {
-    height: 2.25rem;
-    float: right;
-    border: none;
+.fhandler-field_desc + input,
+.fhandler-field_desc + select {
+    min-height: 2.25rem;
     padding: 0.375rem 10px;
-    display: inline-block;
-    font-size: 1rem;
-    width: 260px;
+    float: right;
     clear: right;
-    background: #fff;
+    text-align: right;
+    width: 260px;
+    line-height: 2.25rem;
+    background: #f6f6f6;
+    font-size: 0.875rem;
+    font-size: 1rem;
+    border: none;
+    display: inline-block;
 }
 
-.formhandler label:nth-of-type(odd) {
-    background: #f9f9f9;
-} 
+.fhandler-field_desc + select {
+    padding: 0;
+}
+
+
+.fhandler-field_desc {
+    min-height: 2.25rem;
+    float: left;
+    text-align: left;
+    clear: left;
+    display: inline-block;
+    width: 200px;
+    font-size: 0.875rem;
+    font-size: 1rem;
+    padding-bottom: 1.5rem;
+}
+
+.fhandler-field_desc label {
+    line-height: 2.25rem;
+    font-weight: bold;
+}
+
+.fhandler-field_desc + *:focus {
+    /* more important to know focused than hovering */
+    opacity: 0.6;
+    color: #c75375;
+    border-bottom: 1px solid #c75375 !important;
+}
+
+.fhandler-field_desc:hover + *,
+.fhandler-field_desc:hover,
+.formhandler input:not([type=submit]):hover,
+.formhandler select:hover {
+    color: #c75375;
+}
+
+.fhandler-field_desc-help {
+    color: #777;
+    font-size: 0.825rem;
+}
 
 .formhandler input:nth-of-type(even), 
 .formhandler select:nth-of-type(even) {
-    background: #f9f9f9;
+    background: #f6f6f6;
 }
 
 .formhandler select {
@@ -90,26 +129,14 @@ body {
 .formhandler input[type=file] {
     font-size: 0.875rem;
     height: 2.25rem;
-    padding: 0;
-}
-
-.formhandler label {
-    float: left;
-    clear: left;
-    width: 200px;
-    font-size: 0.875rem;
-}
-
-.formhandler label:hover + *,
-.formhandler label:hover {
-    opacity: 0.5;
+    padding: 0 10px;
 }
 
 .formhandler input[type=submit] {
     background: #c74375;
     display: block;
     color: #fff;
-    margin: 1.5rem 0;
+    margin-bottom: 1.5rem;
     line-height: 3rem;
     height: 3rem;
     border: none;
@@ -117,7 +144,8 @@ body {
     padding: 0 20px;
     cursor: pointer;
     text-transform: uppercase;
-    float: right;
+    float: left;
+    clear: both;
 }
 
 .formhandler input[type=submit]:hover {
