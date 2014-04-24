@@ -15,10 +15,9 @@ In a couple of commands, in one CGI script, use a function to:
 Includes tools for automatically converting data returned from a
 function, to HTML, e.g., dict > html, list > html, etc.
 
-Written because I hate making "web interfaces" for data automation
-stuff at work (I do business logistics automation). Allowing you to
-use function(s) to generate HTML input form(s) AND handle displaying
-function output to the user, with one command.
+I was tired of making and updating  web interfaces to various scripts
+I've written at work. Various people use various scripts through super
+simple CGI scripts.
 
 DEVELOPER NOTES:
   - Needs some prettification; will probably use BeautifulSoup...
@@ -44,6 +43,7 @@ except ImportError:
 # CONFIG/CONSTANTS ############################################################
 
 
+# these should all go to config module!
 FORM = '''
        <form enctype="multipart/form-data" method="post" class="formhandler">
          <fieldset>
@@ -56,7 +56,7 @@ FORM = '''
        </form>
        '''
 SELECT = '''
-         <label for="{name}">{label}</label>
+         <label for="{name}">{label}{help}</label>
          <select name="{name}" id="{name}"{required}>
            <optgroup label="{label}&hellip;">
              {options}
@@ -66,6 +66,7 @@ SELECT = '''
 HTML_INPUT_FIELD = '''
                    <label for="{name}">
                      {label}
+                     {help}
                    </label>
                    <input type="{input type}" 
                           name="{name}"
@@ -164,6 +165,21 @@ def get_params():
     """Get all fields send in get/post, use a well organized
     dictionary!
 
+    Uses cgi.FieldStorage() so you can only use this once to get
+    your CGI field dictionary.
+
+    Returns:
+      dict: POST/GET fields. Key is field name. If value is file, value
+        becomes tuple(filename, file contents). Value could also either
+        be a string, or a list of values (as with check boxes).
+
+        {
+         'name': 'lillian mahoney',
+         'resume': ('configured_upload_dir/my_resume.pdf', file_data),
+         'availability': ['monday', 'tuesday', 'friday']
+        }
+        
+
     """
 
     params = {}
@@ -187,8 +203,8 @@ def get_params():
 class Field(object):
 
     def __init__(self, function, name, field_type=None, options=None,
-                 label=None, argument=None, required=False):
-        """HTML representation of an argument.
+                 label=None, argument=None, required=False, help_text=None):
+        """HTML field representation of an argument.
 
         Extends function argument meta data.
 
@@ -198,6 +214,7 @@ class Field(object):
         self.options = options
         self.argument = argument or name
         self.label = label or var_title(name)
+        self.help_text = '<p>' + help_text + '</p>' if help_text else ''
 
         if self.argument in function.args:
             self.required = True
@@ -209,9 +226,9 @@ class Field(object):
         return self.to_html()
 
     def to_html(self):
-        fields = []
         arg = {
                'name': self.argument,
+               'help': self.help_text,
                'type': self.field_type,
                'label': self.label,
                'required': ' required' if self.required else ' ',
@@ -221,7 +238,8 @@ class Field(object):
             option = '<option value="%s">%s</option>'
             options = [option % (o, var_title(o)) for o in self.options]
             arg['options'] = '\n'.join(options)
-            fields.append(SELECT.format(**arg))
+
+            return SELECT.format(**arg)
 
         elif self.field_type in ['checkbox', 'radio']:
             items = []
@@ -233,28 +251,22 @@ class Field(object):
                          'option title': var_title(option),
                         }
                 parts.update(arg)
-                field = '''
-                        <label for="{option}">
-                          <input type="{list type}" id="{option}"
-                                 name="{name}" value="{option}">
-                          {option title}
-                        </label>
-                        '''.format(**parts)
+                field = HTML_INPUT_FIELD.format(**parts)
                 items.append(field)
 
-            fields.append('\n'.join(items))
+            return '\n'.join(items)
 
+        # pattern
         elif self.field_type in ('text', 'file'):
             parts = {'input type': self.field_type}
             parts.update(arg)
-            fields.append(HTML_INPUT_FIELD.format(**parts))
+
+            return HTML_INPUT_FIELD.format(**parts)
 
         else:
 
             raise Exception(('invalid arg type for %s' % argument_name,
                               arg['type'],))
-
-        return '\n'.join(fields)
 
 
 class FuncPrep(object):
@@ -299,12 +311,11 @@ class FuncPrep(object):
 class Form(object):
 
     def __init__(self, function):
-        """Automate HTML interfaces to Python functions.
+        """HTML form and its resulting page (from function).
 
         Args:
-          function (func): the function to interface with. I suggest you
-            assign function.field_types, since the default field type
-            is a text input field.
+          function (func): Function to use for generating the HTML form
+            and its resulting page.
 
         """
 
@@ -320,8 +331,8 @@ class Form(object):
         """Returns the HTML input form for a function.
 
         Returns:
-          str: HTML input form, for submitting arguments to a python
-            function, via POST/GET.
+          str: HTML input form, for submitting arguments to this
+            very form.
 
         """
 
@@ -356,13 +367,13 @@ class Form(object):
         return FORM.format(**form_parts)
 
     def evaluate(self, form):
-        """Evaluate function data and parse as HTML.
+        """HTML pag eresulting from submitting this form's input form.
 
         Args:
-          Form: see get_params().
+          form (dict): See get_params().
 
         Returns:
-          None: sets self.params, self.evaluation
+          None: Sets self.params and self.evaluation.
 
         """
 
@@ -419,10 +430,10 @@ class Form(object):
 
             # Evaluation is an iterable sequence of dictionaries?
             if isinstance(evaluation[0], dict):
-                possible_table = iter_dicts_table(evaluation)
+                possible_table = iter_dicts_table(evaluation, check=True)
 
                 if possible_table:
-                    self.evaluation = paragraphs(evaluation)
+                    self.evaluation = possible_table
                     self.params = form
 
                     return None
