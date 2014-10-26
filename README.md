@@ -1,5 +1,5 @@
-formhandler (DISCONTINUED)
-==========================
+formhandler (DISCONTINUED/NOT MAINTAINED)
+=========================================
 
 Tested functional with Python 2.7.6 and Python 3.4.
 
