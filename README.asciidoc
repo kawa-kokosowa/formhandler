@@ -47,45 +47,32 @@ directory. Change to the +example/+ directory and list its contents:
 ----
 $ cd example
 $ ls
-resources    test.py      testhttpd.py tpl
+resources    cgi-bin      tpl
 ----
 
-First note that this is the web root of the +testhttpd.py+ test/debug web
-server. So +test.py+ will be available through +http://localhost:8080/test.py+
++example/+ is basically a web root. You'll run this command to serve it through an HTTP/CGI server:
+
+----
+$ python -m CGIHTTPServer 8080
+----
+
++cgi-bin/test.py+ will be available through +http://localhost:8080/cgi-bin/test.py+
 (presuming your currend directory is +example/+).
 
 resources::
   This directory contains static resources, e.g., CSS, which are available via
 +http://localhost/resources/*+.
-test.py::
-  This is an example FormHandler CGI script, It's really the main focus of the
-example. It shows you how to utilize FormHandler, from a developer perspective.
-testhttpd.py::
-  You run this to serve the current directory via a debug HTTP/CGI server. This
-makes available +http://localhost:8080/test.py+ as well as other files in the
-current directory and its descendants.
+cgi-bin::
+  This directory contains the example +test.py+ FormHandler CGI script. It's the main focus of the +example/+ directory, and the example in general. It shows you how to utilize FormHandler, from a web developer's perspective.
 tpl::
   Oft-repeated HTML macros, e.g., header, footer. Parsed with the FormHandler's
 template engine. Like a spiffier PHP include.
   
-I recommend viewing +test.py+ in an editor to see how to develop with
-FormHandler.
-
-Don't forget to first mark +test.py+ as executable:
+Don't forget to first mark +cgi-bin/test.py+ as executable for all users:
 
 ----
-$ chmod +x test.py
+$ chmod a+x cgi-bin/test.py
 ----
-
-When you run the debugging/demo web server:
-
-----
-$ python testhttpd.py
-----
-
-...it should open the correct URI to +test.py+ for you in a new web browser tab.
-
-You may need to change file headers (#!/usr/bin/python).
 
 You need to create the uploads and resources directory for the demo. Just make demo directory.
 
@@ -96,4 +83,8 @@ You're supposed to install FormHandler as a package. It should not be in your pu
 FormHandler uses introspection to extrapolate any assumptions it can make, e.g., it is able to extrapolate the function name and its argument names through this method.
 
 You have to do a little manual specification when FormHandler is too stupid to assume any context, such as tell it that certain arguments are supposed to be files/a file field.
+
+= Caveats
+
+  * Did you know that line-terminators in CGI scripts can ruin your day? A CGI script wouldn't run until I ran dos2unix (in freebsd it's a package unix2dos which also installs dos2unix); +$ dos2unix cgi-bin/test.py+
 
