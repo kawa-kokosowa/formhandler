@@ -1,10 +1,15 @@
 #!/usr/local/bin/python
-"""For testing purposes only, don't seriously use this as your
-primary HTTPD.
+# example/testhttpd.py
+# Lillian Lemmer <lillian.lynn.lemmer@gmail.com>
+#
+# This module is part of FormHandler and is released under the
+# MIT license: http://opensource.org/licenses/MIT
 
-Seriously.
+"""Server the current directory via a debugging CGI/HTTP server.
 
-I mean, I'm pretty sure you can make the server execute itself, y'know?
+Don't use this as your primary HTTPD. Once you run testhttpd.py it
+should open the correct URI for test.py in a new tab of your web
+browser.
 
 """
 

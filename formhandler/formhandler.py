@@ -1,6 +1,11 @@
 #!/usr/local/bin/python
+# formhandler/formhandler.py
+# Lillian Lemmer <lillian.lynn.lemmer@gmail.com>
+#
+# This module is part of FormHandler and is released under the
+# MIT license: http://opensource.org/licenses/MIT
+
 """formhandler: sometimes the web interface is an afterthought.
-Lillian Lynn Lemmer
 
 Automate the development of a web/CGI script interface to a function.
 

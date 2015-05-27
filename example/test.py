@@ -1,5 +1,18 @@
 #!/usr/local/bin/python3.4
-"""An example of formhandler's capabilities.
+# example/test.py
+# Lillian Lemmer <lillian.lynn.lemmer@gmail.com>
+#
+# This module is part of FormHandler and is released under the
+# MIT license: http://opensource.org/licenses/MIT
+
+"""Demo/example CGI script to show developers how to use FormHandler.
+
+This belongs to the example/ directory of the FormHandler project. See
+README.asciidoc for more details.
+
+Right now it has two forms: one which takes a string and converts
+lowercase letters to uppercase ones, and another which takes an
+image from upload/POST and displays it to the user.
 
 """
 
@@ -8,7 +21,6 @@ from formhandler.formhandler import FormHandler
 import os
 
 
-# TEST!
 def make_uppercase(s):
     """Test function for converting a string to uppercase.
 

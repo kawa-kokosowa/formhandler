@@ -1,5 +1,11 @@
+#!/usr/local/bin/python
+# formhandler/tpl.py
+# Lillian Lemmer <lillian.lynn.lemmer@gmail.com>
+#
+# This module is part of FormHandler and is released under the
+# MIT license: http://opensource.org/licenses/MIT
+
 """tpl: super simple templater.
-Lillian Lynn Mahoney
 
 """
 
