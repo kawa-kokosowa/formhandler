@@ -77,7 +77,6 @@ handler.make_uppercase('s', label='Text to transform')
 # Output content/page
 replacements = {'title': 'Demo Form'}
 content = handler.html(replacements)
-content = template(content, replacements={'title': 'Demo Form'})
 
 print('Content-Type: text/html\n')
 print(content)
