@@ -50,14 +50,13 @@ $ ls
 resources    cgi-bin      tpl
 ----
 
-+example/+ is basically a web root. You'll run this command to serve it through an HTTP/CGI server:
++example/+ is basically a web root. You can run this command to serve/test it through an HTTP/CGI server:
 
 ----
 $ python -m CGIHTTPServer 8080
 ----
 
-+cgi-bin/test.py+ will be available through +http://localhost:8080/cgi-bin/test.py+
-(presuming your currend directory is +example/+).
++cgi-bin/test.py+ will be available through +http://localhost:8080/cgi-bin/test.py+. I strongly suggest using an actual HTTPD like nginx or Apache.
 
 resources::
   This directory contains static resources, e.g., CSS, which are available via
