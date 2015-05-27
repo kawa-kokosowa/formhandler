@@ -1,6 +1,6 @@
 #!/usr/local/bin/python
 """formhandler: sometimes the web interface is an afterthought.
-Lillian Lynn Mahoney
+Lillian Lynn Lemmer
 
 Automate the development of a web/CGI script interface to a function.
 

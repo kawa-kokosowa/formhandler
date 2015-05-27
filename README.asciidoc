@@ -1,3 +1,11 @@
+= Warning/Preface
+
+*Warning:* this is a repository I haven't _seriously_ touched since October, 2014. I recently updated it with better documentation, some fixes, just because some friends of mine were interested in it, and heck, it looks good on a resume.
+
+That's not to say I'm not interested in hearing what you have to say! Please, drop me an e-mail if you have any comments! My email is lillian.lynn.lemmer@gmail.com. Though, I don't plan on adding any new features or continuing the development of Formhandler in any serious manner.
+
+This software was more so created as an experiment, to flex my brain and learn some things.
+
 = formhandler: automatically fulfill the job of a frontend developer for simple tasks
 
 In a couple of commands, in one CGI script, use a function to:
