@@ -1,4 +1,3 @@
-#!/usr/local/bin/python
 # formhandler/tpl.py
 # Lillian Lemmer <lillian.lynn.lemmer@gmail.com>
 #
